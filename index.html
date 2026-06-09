@@ -1,47 +1,195 @@
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arraste Cada Comando para a Máquina Certa!</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); }
-#app { background: #fffde7; min-height: 500px; padding: 16px; border-radius: var(--border-radius-lg); }
-h1 { text-align: center; font-size: 17px; font-weight: 500; color: #7c4dff; margin-bottom: 4px; letter-spacing: 0.5px; }
-.subtitle { text-align: center; font-size: 12px; font-weight: 500; color: #666; margin-bottom: 10px; letter-spacing: 1px; }
-.commands-box { background: white; border: 2px dashed #ccc; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 60px; justify-content: center; }
-.cmd { display: inline-flex; align-items: center; gap: 5px; background: white; border: 1.5px solid #ddd; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: grab; user-select: none; transition: box-shadow 0.15s, opacity 0.15s; color: var(--color-text-primary); }
-.cmd:active { cursor: grabbing; }
-.cmd.dragging { opacity: 0.4; }
-.cmd .icon { font-size: 14px; }
-.machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
-.machine { background: white; border-radius: 12px; padding: 12px 10px; min-height: 130px; display: flex; flex-direction: column; align-items: center; border: 2px solid; }
-.machine.tv { border-color: #42a5f5; }
-.machine.pc { border-color: #66bb6a; }
-.machine.micro { border-color: #ffa726; }
-.machine-icon { font-size: 36px; margin-bottom: 4px; }
-.machine-name { font-size: 12px; font-weight: 500; margin-bottom: 6px; text-align: center; }
-.machine.tv .machine-name { color: #1565c0; }
-.machine.pc .machine-name { color: #2e7d32; }
-.machine.micro .machine-name { color: #e65100; }
-.drop-zone { width: 100%; flex: 1; border: 1.5px dashed #ccc; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-height: 50px; align-items: center; justify-content: flex-start; transition: background 0.15s; }
-.drop-zone.over { background: #e3f2fd; border-color: #42a5f5; }
-.drop-zone .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
-.placed-cmd { display: inline-flex; align-items: center; gap: 4px; border-radius: 14px; padding: 3px 9px; font-size: 11px; font-weight: 500; width: fit-content; cursor: grab; }
-.placed-cmd.correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-.placed-cmd.wrong { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
-.placed-cmd.neutral { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
-.stats { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 10px; font-size: 13px; font-weight: 500; }
-.stat { display: flex; align-items: center; gap: 5px; }
-.stat-hits { color: #2e7d32; }
-.stat-total { color: #555; }
-.stat-err { color: #c62828; }
-.score-badge { display: inline-block; background: #fff3e0; color: #e65100; border: 1.5px solid #ffcc80; border-radius: 8px; padding: 2px 10px; font-size: 13px; font-weight: 500; }
-.btn-restart { display: block; margin: 0 auto; padding: 7px 22px; border-radius: 8px; border: 1.5px solid #aaa; background: white; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--color-text-primary); }
-.btn-restart:hover { background: #f5f5f5; }
-.result-msg { text-align: center; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #7c4dff; min-height: 20px; }
-</style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #fffde7;
+    min-height: 100vh;
+    padding: 18px;
+  }
+  #app {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  h1 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #7c4dff;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
 
+  /* Pool de comandos */
+  .commands-box {
+    background: white;
+    border: 2px dashed #ccc;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 56px;
+    justify-content: center;
+    align-items: center;
+  }
+  .commands-box.empty-hint {
+    color: #bbb;
+    font-size: 13px;
+    font-style: italic;
+    justify-content: center;
+  }
+
+  /* Botão de comando arrastável */
+  .cmd {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: white;
+    border: 1.5px solid #ddd;
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: grab;
+    user-select: none;
+    color: #333;
+    transition: box-shadow 0.12s, transform 0.12s;
+  }
+  .cmd:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); transform: translateY(-1px); }
+  .cmd.dragging { opacity: 0.35; cursor: grabbing; }
+
+  /* Grade de máquinas */
+  .machines {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .machine {
+    background: white;
+    border-radius: 14px;
+    padding: 12px 10px 10px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid;
+  }
+  .machine.tv    { border-color: #42a5f5; }
+  .machine.pc    { border-color: #66bb6a; }
+  .machine.micro { border-color: #ffa726; }
+
+  .machine-icon { font-size: 38px; margin-bottom: 4px; }
+  .machine-name { font-size: 12px; font-weight: 700; margin-bottom: 8px; text-align: center; letter-spacing: 0.5px; }
+  .machine.tv    .machine-name { color: #1565c0; }
+  .machine.pc    .machine-name { color: #2e7d32; }
+  .machine.micro .machine-name { color: #e65100; }
+
+  /* Zona de soltar */
+  .drop-zone {
+    width: 100%;
+    flex: 1;
+    border: 1.5px dashed #ccc;
+    border-radius: 10px;
+    padding: 6px 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+    transition: background 0.15s, border-color 0.15s;
+    min-height: 48px;
+  }
+  .drop-zone.over { background: #e3f2fd; border-color: #42a5f5; }
+  .drop-zone .hint { font-size: 11px; color: #bbb; margin-top: 4px; }
+
+  /* Comandos já colocados */
+  .placed-cmd {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 14px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: grab;
+    user-select: none;
+  }
+  .placed-cmd.correct { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; }
+  .placed-cmd.wrong   { background: #ffebee; color: #c62828; border: 1.5px solid #ef9a9a; }
+
+  /* Estatísticas */
+  .stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    flex-wrap: wrap;
+  }
+  .stat-hits  { color: #2e7d32; }
+  .stat-total { color: #666; }
+  .stat-err   { color: #c62828; }
+
+  /* Mensagem de resultado final */
+  .result-box {
+    display: none;
+    text-align: center;
+    background: white;
+    border: 2px solid #7c4dff;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .result-box.show { display: block; }
+  .result-title { font-size: 20px; font-weight: 700; color: #7c4dff; margin-bottom: 6px; }
+  .result-score { font-size: 44px; font-weight: 700; margin: 6px 0; }
+  .result-score.great  { color: #2e7d32; }
+  .result-score.medium { color: #f57c00; }
+  .result-score.low    { color: #c62828; }
+  .result-msg { font-size: 14px; color: #555; margin-top: 4px; }
+  .result-detail { font-size: 12px; color: #888; margin-top: 6px; }
+
+  /* Botão recomeçar */
+  .btn-restart {
+    display: block;
+    margin: 0 auto;
+    padding: 8px 24px;
+    border-radius: 9px;
+    border: 1.5px solid #aaa;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.12s;
+  }
+  .btn-restart:hover { background: #f5f5f5; }
+</style>
+</head>
+<body>
 <div id="app">
-  <h2 class="sr-only">Jogo de arrastar comandos para as máquinas corretas</h2>
-  <h1>🎮 ARRASTE CADA COMANDO PARA A MÁQUINA CERTA! 👇</h1>
-  <div class="subtitle">✨ COMANDOS PARA ORGANIZAR:</div>
+  <h1>🎮 Arraste cada comando para a máquina certa! 👇</h1>
+  <div class="subtitle">✨ Comandos para organizar:</div>
 
   <div class="commands-box" id="cmd-pool"></div>
 
@@ -69,126 +217,243 @@ h1 { text-align: center; font-size: 17px; font-weight: 500; color: #7c4dff; marg
     </div>
   </div>
 
-  <div class="result-msg" id="result-msg"></div>
+  <!-- Resultado final -->
+  <div class="result-box" id="result-box">
+    <div class="result-title" id="result-emoji"></div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="result-detail" id="result-detail"></div>
+  </div>
 
   <div class="stats">
-    <div class="stat stat-hits">✅ Acertos: <span id="hits">0</span></div>
-    <div class="stat stat-total">⭐ de <span id="total">12</span> comandos</div>
-    <div class="stat stat-err">❌ Erros: <span id="errs">0</span></div>
+    <span class="stat-hits">✅ Acertos: <span id="hits">0</span></span>
+    <span class="stat-total">⭐ de <span id="total">12</span> comandos</span>
+    <span class="stat-err">❌ Erros: <span id="errs">0</span></span>
   </div>
 
   <button class="btn-restart" onclick="restart()">🔄 Recomeçar</button>
 </div>
 
 <script>
-const ALL_CMDS = [
-  { id:'c1', label:'AUMENTAR O SOM', icon:'🔊', correct:'tv' },
-  { id:'c2', label:'PARAR', icon:'⏹', correct:'tv' },
-  { id:'c3', label:'PESQUISAR', icon:'🔍', correct:'pc' },
-  { id:'c4', label:'POTÊNCIA', icon:'🔥', correct:'micro' },
-  { id:'c5', label:'MUDAR DE CANAL', icon:'📡', correct:'tv' },
-  { id:'c6', label:'SILÊNCIAR', icon:'🔇', correct:'tv' },
-  { id:'c7', label:'DESLIGAR', icon:'🟠', correct:'micro' },
-  { id:'c8', label:'DIGITAR', icon:'⌨', correct:'pc' },
-  { id:'c9', label:'INICIAR', icon:'▶', correct:'pc' },
-  { id:'c10', label:'TEMPO', icon:'⏱', correct:'micro' },
-  { id:'c11', label:'MOVER', icon:'🖱', correct:'pc' },
-  { id:'c12', label:'SALVAR', icon:'💾', correct:'pc' },
+var ALL_CMDS = [
+  { id:'c1',  label:'AUMENTAR O SOM',  icon:'🔊', correct:'tv'    },
+  { id:'c2',  label:'PARAR',           icon:'⏹',  correct:'tv'    },
+  { id:'c3',  label:'PESQUISAR',       icon:'🔍', correct:'pc'    },
+  { id:'c4',  label:'POTÊNCIA',        icon:'🔥', correct:'micro' },
+  { id:'c5',  label:'MUDAR DE CANAL',  icon:'📡', correct:'tv'    },
+  { id:'c6',  label:'SILÊNCIAR',       icon:'🔇', correct:'tv'    },
+  { id:'c7',  label:'DESLIGAR',        icon:'🟠', correct:'micro' },
+  { id:'c8',  label:'DIGITAR',         icon:'⌨️', correct:'pc'    },
+  { id:'c9',  label:'INICIAR',         icon:'▶️', correct:'pc'    },
+  { id:'c10', label:'TEMPO',           icon:'⏱️', correct:'micro' },
+  { id:'c11', label:'MOVER',           icon:'🖱️', correct:'pc'    },
+  { id:'c12', label:'SALVAR',          icon:'💾', correct:'pc'    }
 ];
 
-let hits = 0, errs = 0;
-let dragCmd = null, dragFrom = null;
+var hits = 0;
+var errs = 0;
+var dragCmdId = null;
+var dragFromMachine = null; // 'pool' ou 'tv'/'pc'/'micro'
 
 function getEl(id){ return document.getElementById(id); }
+
+function getCmdById(id){
+  for(var i=0;i<ALL_CMDS.length;i++){
+    if(ALL_CMDS[i].id===id) return ALL_CMDS[i];
+  }
+  return null;
+}
+
+function placedIds(){
+  var ids = [];
+  var els = document.querySelectorAll('.drop-zone .placed-cmd');
+  for(var i=0;i<els.length;i++) ids.push(els[i].getAttribute('data-id'));
+  return ids;
+}
 
 function updateStats(){
   getEl('hits').textContent = hits;
   getEl('errs').textContent = errs;
-  const placed = document.querySelectorAll('.placed-cmd.correct').length;
-  if(placed === ALL_CMDS.length){
-    const score = Math.max(0, Math.round(10 - errs * 0.8));
-    getEl('result-msg').textContent = `🎉 Parabéns! Você completou o jogo! Nota: ${score}/10`;
-  }
 }
 
-function makeCmdEl(cmd, inPool){
-  const el = document.createElement('div');
-  el.className = 'cmd' + (inPool ? '' : ' placed-cmd neutral');
-  el.draggable = true;
-  el.dataset.id = cmd.id;
-  el.innerHTML = `<span class="icon">${cmd.icon}</span><span>${cmd.label}</span>`;
-  el.addEventListener('dragstart', e => {
-    dragCmd = cmd;
-    dragFrom = inPool ? 'pool' : e.target.closest('.drop-zone')?.dataset?.machine;
-    setTimeout(()=> el.classList.add('dragging'), 0);
-  });
-  el.addEventListener('dragend', () => el.classList.remove('dragging'));
-  return el;
+function calcScore(){
+  // Nota de 0 a 10: começa em 10, desconta 0.8 por erro, mínimo 0
+  var nota = 10 - (errs * 0.8);
+  if(nota < 0) nota = 0;
+  return Math.round(nota * 10) / 10; // 1 casa decimal
+}
+
+function showResult(){
+  var score = calcScore();
+  var box   = getEl('result-box');
+  var elScore = getEl('result-score');
+  var elMsg   = getEl('result-msg');
+  var elEmoji = getEl('result-emoji');
+  var elDet   = getEl('result-detail');
+
+  elScore.textContent = score.toFixed(1) + ' / 10';
+  elDet.textContent   = 'Acertos: ' + hits + ' | Erros: ' + errs;
+
+  if(score >= 9){
+    elEmoji.textContent = '🏆 Parabéns! Excelente!';
+    elScore.className   = 'result-score great';
+    elMsg.textContent   = 'Você domina as máquinas!';
+  } else if(score >= 6){
+    elEmoji.textContent = '😊 Muito bom!';
+    elScore.className   = 'result-score great';
+    elMsg.textContent   = 'Boa pontuação! Continue praticando.';
+  } else if(score >= 4){
+    elEmoji.textContent = '😐 Pode melhorar!';
+    elScore.className   = 'result-score medium';
+    elMsg.textContent   = 'Tente novamente para melhorar sua nota.';
+  } else {
+    elEmoji.textContent = '😟 Vamos tentar de novo?';
+    elScore.className   = 'result-score low';
+    elMsg.textContent   = 'Não desanime! A prática leva à perfeição.';
+  }
+
+  box.className = 'result-box show';
 }
 
 function renderPool(){
-  const pool = getEl('cmd-pool');
-  const remaining = ALL_CMDS.filter(c => !document.querySelector(`.drop-zone [data-id="${c.id}"]`));
+  var pool = getEl('cmd-pool');
+  var placed = placedIds();
+  var remaining = ALL_CMDS.filter(function(c){
+    return placed.indexOf(c.id) === -1;
+  });
+
   pool.innerHTML = '';
-  if(remaining.length === 0){ pool.innerHTML = '<span style="font-size:12px;color:#aaa;">Todos os comandos foram distribuídos!</span>'; return; }
-  remaining.forEach(c => pool.appendChild(makeCmdEl(c, true)));
+  if(remaining.length === 0){
+    pool.classList.add('empty-hint');
+    pool.textContent = 'Todos os comandos foram distribuídos!';
+    return;
+  }
+  pool.classList.remove('empty-hint');
+  remaining.forEach(function(cmd){
+    pool.appendChild(makeCmdEl(cmd, 'pool'));
+  });
 }
 
-['tv','pc','micro'].forEach(machine => {
-  const zone = getEl('drop-'+machine);
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('over');
-    if(!dragCmd) return;
-    const hint = zone.querySelector('.hint');
+function makeCmdEl(cmd, fromMachine){
+  var el = document.createElement('div');
+  el.className = 'cmd';
+  el.draggable = true;
+  el.setAttribute('data-id', cmd.id);
+  el.innerHTML = '<span>' + cmd.icon + '</span><span>' + cmd.label + '</span>';
 
-    const isCorrect = dragCmd.correct === machine;
-    if(isCorrect){ hits++; } else { errs++; }
+  el.addEventListener('dragstart', function(e){
+    dragCmdId      = cmd.id;
+    dragFromMachine = fromMachine;
+    setTimeout(function(){ el.classList.add('dragging'); }, 0);
+  });
+  el.addEventListener('dragend', function(){
+    el.classList.remove('dragging');
+  });
+  return el;
+}
 
-    const placed = document.createElement('div');
-    placed.className = 'placed-cmd ' + (isCorrect ? 'correct' : 'wrong');
-    placed.dataset.id = dragCmd.id;
-    placed.draggable = true;
-    placed.innerHTML = `<span>${dragCmd.icon}</span><span>${dragCmd.label}</span>`;
-    placed.addEventListener('dragstart', e2 => {
-      dragCmd = ALL_CMDS.find(c=>c.id===dragCmd.id);
-      dragFrom = machine;
-      setTimeout(()=>placed.classList.add('dragging'),0);
-      zone.removeChild(placed);
-      if(isCorrect) hits = Math.max(0, hits-1); else errs = Math.max(0, errs-1);
-      updateStats();
-      renderPool();
-    });
-    zone.appendChild(placed);
-    if(hint) hint.style.display='none';
-    dragCmd = null;
-    dragFrom = null;
+function makePlacedEl(cmd, isCorrect, inMachine){
+  var el = document.createElement('div');
+  el.className = 'placed-cmd ' + (isCorrect ? 'correct' : 'wrong');
+  el.draggable = true;
+  el.setAttribute('data-id', cmd.id);
+  el.innerHTML = '<span>' + cmd.icon + '</span><span>' + cmd.label + '</span>';
+
+  el.addEventListener('dragstart', function(e){
+    dragCmdId       = cmd.id;
+    dragFromMachine = inMachine;
+    // Remove da zona e reverte contadores ANTES de iniciar novo drag
+    var zone = getEl('drop-' + inMachine);
+    if(zone.contains(el)) zone.removeChild(el);
+    if(isCorrect){ hits = Math.max(0, hits-1); }
+    else          { errs = Math.max(0, errs-1); }
     updateStats();
     renderPool();
+    // Garante hint se zona ficou vazia
+    refreshHint(zone);
+    setTimeout(function(){ }, 0);
   });
-});
+  return el;
+}
 
-getEl('cmd-pool').addEventListener('dragover', e => e.preventDefault());
-getEl('cmd-pool').addEventListener('drop', e => {
+function refreshHint(zone){
+  if(!zone.querySelector('.placed-cmd')){
+    if(!zone.querySelector('.hint')){
+      var h = document.createElement('span');
+      h.className = 'hint';
+      h.textContent = 'Solte aqui ↓';
+      zone.appendChild(h);
+    }
+  }
+}
+
+function setupZone(machine){
+  var zone = getEl('drop-' + machine);
+
+  zone.addEventListener('dragover', function(e){
+    e.preventDefault();
+    zone.classList.add('over');
+  });
+  zone.addEventListener('dragleave', function(){
+    zone.classList.remove('over');
+  });
+  zone.addEventListener('drop', function(e){
+    e.preventDefault();
+    zone.classList.remove('over');
+    if(!dragCmdId) return;
+
+    var cmd = getCmdById(dragCmdId);
+    if(!cmd) return;
+    dragCmdId = null;
+    dragFromMachine = null;
+
+    var isCorrect = (cmd.correct === machine);
+    if(isCorrect) hits++; else errs++;
+    updateStats();
+
+    // Remove hint se existir
+    var hint = zone.querySelector('.hint');
+    if(hint) zone.removeChild(hint);
+
+    zone.appendChild(makePlacedEl(cmd, isCorrect, machine));
+    renderPool();
+
+    // Verifica se todos foram colocados
+    if(placedIds().length === ALL_CMDS.length){
+      showResult();
+    }
+  });
+}
+
+// Drop de volta ao pool
+getEl('cmd-pool').addEventListener('dragover', function(e){ e.preventDefault(); });
+getEl('cmd-pool').addEventListener('drop', function(e){
   e.preventDefault();
-  if(!dragCmd || dragFrom === 'pool') return;
+  dragCmdId = null;
+  dragFromMachine = null;
   renderPool();
-  dragCmd = null; dragFrom = null;
-  updateStats();
 });
 
 function restart(){
   hits = 0; errs = 0;
-  getEl('result-msg').textContent = '';
-  ['tv','pc','micro'].forEach(m => {
-    const z = getEl('drop-'+m);
+  dragCmdId = null;
+  dragFromMachine = null;
+
+  ['tv','pc','micro'].forEach(function(m){
+    var z = getEl('drop-' + m);
     z.innerHTML = '<span class="hint">Solte aqui ↓</span>';
   });
+
+  getEl('result-box').className = 'result-box';
   updateStats();
   renderPool();
 }
 
+// Setup inicial
+setupZone('tv');
+setupZone('pc');
+setupZone('micro');
 restart();
 </script>
+</body>
+</html>
